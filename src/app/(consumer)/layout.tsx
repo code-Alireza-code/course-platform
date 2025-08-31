@@ -1,4 +1,6 @@
 import { Button } from "@/components/ui/button";
+import { canAccessAdminPages } from "@/permissions/general";
+import { getCurrentUser } from "@/services/clerk";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { ReactNode, Suspense } from "react";
@@ -24,12 +26,7 @@ function Navbar() {
         </Link>
         <Suspense fallback={"Loading"}>
           <SignedIn>
-            <Link
-              href="/admin"
-              className="hover:bg-accent/10 flex items-center px-2"
-            >
-              My Courses
-            </Link>
+            <AdminLink />
             <Link
               href="/courses"
               className="hover:bg-accent/10 flex items-center px-2"
@@ -62,6 +59,16 @@ function Navbar() {
         </Suspense>
       </nav>
     </header>
+  );
+}
+
+async function AdminLink() {
+  const { role } = await getCurrentUser();
+  if (!canAccessAdminPages(role)) return null;
+  return (
+    <Link href="/admin" className="hover:bg-accent/10 flex items-center px-2">
+      Admin
+    </Link>
   );
 }
 
