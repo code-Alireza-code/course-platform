@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   experimental: {
     authInterrupts: true,
     cacheComponents: true,
+    useCache: true,
   },
 };
 
