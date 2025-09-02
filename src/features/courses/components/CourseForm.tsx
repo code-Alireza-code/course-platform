@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { createCourse } from "../actions/courses";
-import { toast } from "sonner";
+import actionToast from "@/hooks/useToast";
 
 function CourseForm() {
   const form = useForm<z.infer<typeof courseSchema>>({
@@ -31,14 +31,7 @@ function CourseForm() {
   const onSubmit = async (values: z.infer<typeof courseSchema>) => {
     const data = await createCourse(values);
     console.log(data);
-    toast(data.error ? "Error" : "Success", {
-      description: data.message,
-      style: {
-        backgroundColor: "#dc2626",
-        color: "#fff",
-        fontWeight: 600,
-      },
-    });
+    actionToast({ error: data.error, message: data.message });
   };
 
   return (
