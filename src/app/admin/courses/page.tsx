@@ -1,8 +1,22 @@
 import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { db } from "@/drizzle/db";
+import CourseTable from "@/features/courses/components/CourseTable";
+import {
+  CourseSectionTable,
+  CourseTable as DbCourseTable,
+  LessonTable,
+  UserCourseAccessTable,
+} from "@/drizzle/schema";
 
-function CoursesPage() {
+import { getCourseGlobalTag } from "@/features/courses/db/cache";
+import { cacheTag } from "next/dist/server/use-cache/cache-tag";
+import Link from "next/link";
+import { asc, countDistinct, eq } from "drizzle-orm";
+
+async function CoursesPage() {
+  const courses = await getCourses();
+
   return (
     <div className="container my-6">
       <PageHeader title="Courses">
@@ -10,9 +24,36 @@ function CoursesPage() {
           <Link href="/admin/courses/new">New Course</Link>
         </Button>
       </PageHeader>
-      <div>page content</div>
+      <CourseTable courses={courses} />
     </div>
   );
+}
+
+async function getCourses() {
+  "use cache";
+  cacheTag(getCourseGlobalTag());
+
+  return db
+    .select({
+      id: DbCourseTable.id,
+      name: DbCourseTable.name,
+      description: DbCourseTable.description,
+      sectionsCount: countDistinct(CourseSectionTable),
+      lessonsCount: countDistinct(LessonTable),
+      studentsCount: countDistinct(UserCourseAccessTable),
+    })
+    .from(DbCourseTable)
+    .leftJoin(
+      CourseSectionTable,
+      eq(CourseSectionTable.courseId, DbCourseTable.id)
+    )
+    .leftJoin(LessonTable, eq(LessonTable.sectionId, CourseSectionTable.id))
+    .leftJoin(
+      UserCourseAccessTable,
+      eq(UserCourseAccessTable.courseId, CourseSectionTable.id)
+    )
+    .orderBy(asc(DbCourseTable.name))
+    .groupBy(DbCourseTable.id);
 }
 
 export default CoursesPage;

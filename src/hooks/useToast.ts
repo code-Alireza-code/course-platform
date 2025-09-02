@@ -7,8 +7,8 @@ export default function actionToast(actionData: {
   return toast(actionData.error ? "Error" : "Success", {
     description: actionData.message,
     style: {
-      backgroundColor: !actionData.error ? "#dc2626" : "#fff",
-      color: !actionData.error ? "#fff" : "#000",
+      backgroundColor: actionData.error ? "#dc2626" : "#fff",
+      color: actionData.error ? "#fff" : "#000",
       fontWeight: 600,
     },
   });
