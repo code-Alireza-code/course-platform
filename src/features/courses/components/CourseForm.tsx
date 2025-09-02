@@ -18,20 +18,31 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { createCourse } from "../actions/courses";
 import actionToast from "@/hooks/useToast";
+import { updateCourse } from "../actions/courses";
 
-function CourseForm() {
+function CourseForm({
+  course,
+}: {
+  course?: {
+    id: string;
+    name: string;
+    description: string;
+  };
+}) {
   const form = useForm<z.infer<typeof courseSchema>>({
     resolver: zodResolver(courseSchema),
-    defaultValues: {
+    defaultValues: course ?? {
       name: "",
       description: "",
     },
   });
 
   const onSubmit = async (values: z.infer<typeof courseSchema>) => {
-    const data = await createCourse(values);
-    console.log(data);
-    actionToast({ error: data.error, message: data.message });
+    const action =
+      course == null ? createCourse : updateCourse.bind(null, course.id);
+
+    const data = await action(values);
+    actionToast(data);
   };
 
   return (
