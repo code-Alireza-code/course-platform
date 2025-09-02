@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { canAccessAdminPages } from "@/permissions/general";
 import { getCurrentUser } from "@/services/clerk";
@@ -5,7 +6,7 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { ReactNode, Suspense } from "react";
 
-function ConsumerLayout({ children }: Readonly<{ children: ReactNode }>) {
+function AdminLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <>
       <Navbar />
@@ -18,26 +19,32 @@ function Navbar() {
   return (
     <header className="flex h-12 shadow bg-background z-10">
       <nav className="flex gap-4 container">
-        <Link
-          className="mr-auto text-lg hover:underline flex items-center"
-          href="/"
-        >
-          Web Dev Simplified
-        </Link>
+        <div className="mr-auto flex items-center gap-2">
+          <Link className="text-lg hover:underline" href="/">
+            Web Dev Simplified
+          </Link>
+          <Badge className="rounded-sm">Admin</Badge>
+        </div>
         <Suspense fallback={"Loading"}>
           <SignedIn>
             <AdminLink />
             <Link
-              href="/courses"
+              href="/admin/courses"
               className="hover:bg-accent/10 flex items-center px-2"
             >
-              My Courses
+              Courses
             </Link>
             <Link
-              href="/purchases"
+              href="/admin/products"
               className="hover:bg-accent/10 flex items-center px-2"
             >
-              Purchase History
+              Products
+            </Link>
+            <Link
+              href="/admin/sales"
+              className="hover:bg-accent/10 flex items-center px-2"
+            >
+              Sales
             </Link>
             <div className="size-8 self-center">
               <UserButton
@@ -72,4 +79,4 @@ async function AdminLink() {
   );
 }
 
-export default ConsumerLayout;
+export default AdminLayout;
