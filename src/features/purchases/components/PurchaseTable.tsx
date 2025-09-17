@@ -1,9 +1,9 @@
+import ActionButton from "@/components/ActionButton";
 import SkeletonButton, {
   SkeletonArray,
   SkeletonText,
 } from "@/components/Skeleton";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -12,11 +12,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatDate, formatPrice } from "@/lib/formatters";
+import { formatDate, formatPlural, formatPrice } from "@/lib/formatters";
 import Image from "next/image";
-import Link from "next/link";
+import { refundPurchase } from "../actions/purchases";
 
-function UserPurchaseTable({
+export default function PurchaseTable({
   purchases,
 }: {
   purchases: {
@@ -29,13 +29,22 @@ function UserPurchaseTable({
       description: string;
     };
     pricePaidInCents: number;
+    user: {
+      name: string;
+    };
   }[];
 }) {
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Product</TableHead>
+          <TableHead>
+            {formatPlural(purchases.length, {
+              plural: "Sales",
+              singular: "Sale",
+            })}
+          </TableHead>
+          <TableHead>Customer Name</TableHead>
           <TableHead>Amount</TableHead>
           <TableHead>Actions</TableHead>
         </TableRow>
@@ -62,6 +71,7 @@ function UserPurchaseTable({
                 </div>
               </div>
             </TableCell>
+            <TableCell>{purchase.user.name}</TableCell>
             <TableCell>
               {purchase.refundedAt ? (
                 <Badge variant="outline">Refunded</Badge>
@@ -70,9 +80,15 @@ function UserPurchaseTable({
               )}
             </TableCell>
             <TableCell>
-              <Button variant="outline" asChild>
-                <Link href={`/purchases/${purchase.id}`}>Details</Link>
-              </Button>
+              {purchase.refundedAt == null && purchase.pricePaidInCents > 0 && (
+                <ActionButton
+                  action={refundPurchase.bind(null, purchase.id)}
+                  variant="destructiveOutline"
+                  requiredAreyouSure
+                >
+                  Refund
+                </ActionButton>
+              )}
             </TableCell>
           </TableRow>
         ))}
@@ -80,8 +96,6 @@ function UserPurchaseTable({
     </Table>
   );
 }
-
-export default UserPurchaseTable;
 
 export function UserPurchaseTableSkeleton() {
   return (
