@@ -21,7 +21,7 @@ import {
 } from "@/drizzle/schema";
 import { getCourseIdTag } from "@/features/courses/db/cache/courses";
 import { getCourseSectionCourseTag } from "@/features/courseSections/db/cache";
-import { wherePuclicCourseSections } from "@/features/courseSections/permissions/sections";
+import { wherePublicCourseSections } from "@/features/courseSections/permissions/sections";
 import { getLessonCourseTag } from "@/features/lessons/db/cache/lessons";
 import { wherePublicLessons } from "@/features/lessons/permissions/lessons";
 import { getProductIdTag } from "@/features/product/db/cache";
@@ -214,7 +214,7 @@ async function getPublicProduct(id: string) {
             with: {
               courseSections: {
                 columns: { id: true, name: true },
-                where: wherePuclicCourseSections,
+                where: wherePublicCourseSections,
                 orderBy: asc(CourseSectionTable.order),
                 with: {
                   lessons: {

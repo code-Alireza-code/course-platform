@@ -25,7 +25,7 @@ export function canUpdateCourseSections({
   return role === "admin";
 }
 
-export const wherePuclicCourseSections = eq(
+export const wherePublicCourseSections = eq(
   CourseSectionTable.status,
   "public"
 );
